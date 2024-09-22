@@ -18,7 +18,7 @@ app.logger.setLevel(logging.INFO)
 
 def get_redis():
     if not hasattr(g, 'redis'):
-        g.redis = Redis(host="3.83.145.29:6379", db=0, socket_timeout=5)
+        g.redis = Redis(host="3.83.145.29",port=6379, db=0, socket_timeout=5)
     return g.redis
 
 @app.route("/", methods=['POST','GET'])
