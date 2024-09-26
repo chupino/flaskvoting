@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, make_response, g
 from redis import Redis
+from kafka import KafkaProducer
 import os
 import socket
 import random
@@ -21,6 +22,15 @@ def get_redis():
         g.redis = Redis(host="3.83.145.29",port=6379, db=0, socket_timeout=5)
     return g.redis
 
+# Configurar Kafka Producer
+def get_kafka_producer():
+    if not hasattr(g, 'kafka_producer'):
+        g.kafka_producer = KafkaProducer(
+            bootstrap_servers='3.88.186.115:9092',
+            value_serializer=lambda v: json.dumps(v).encode('utf-8')  # Serializar los datos como JSON
+        )
+    return g.kafka_producer
+
 @app.route("/", methods=['POST','GET'])
 def hello():
     voter_id = request.cookies.get('voter_id')
@@ -29,12 +39,23 @@ def hello():
 
     vote = None
 
-    if request.method == 'POST':
+    """if request.method == 'POST':
         redis = get_redis()
         vote = request.form['vote']
         app.logger.info('Received vote for %s', vote)
         data = json.dumps({'voter_id': voter_id, 'vote': vote})
-        redis.rpush('votes', data)
+        redis.rpush('votes', data) """
+    if request.method == 'POST':
+        producer = get_kafka_producer()
+        vote = request.form['vote']
+        app.logger.info('Received vote for %s', vote)
+        
+        # Crear los datos del voto
+        data = {'voter_id': voter_id, 'vote': vote}
+        
+        # Enviar los datos a Kafka
+        producer.send('votes', value=data)
+        producer.flush()
 
     resp = make_response(render_template(
         'index.html',
