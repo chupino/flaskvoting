@@ -17,11 +17,6 @@ gunicorn_error_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers.extend(gunicorn_error_logger.handlers)
 app.logger.setLevel(logging.INFO)
 
-def get_redis():
-    if not hasattr(g, 'redis'):
-        g.redis = Redis(host="3.83.145.29",port=6379, db=0, socket_timeout=5)
-    return g.redis
-
 # Configurar Kafka Producer
 def get_kafka_producer():
     if not hasattr(g, 'kafka_producer'):
@@ -39,12 +34,6 @@ def hello():
 
     vote = None
 
-    """if request.method == 'POST':
-        redis = get_redis()
-        vote = request.form['vote']
-        app.logger.info('Received vote for %s', vote)
-        data = json.dumps({'voter_id': voter_id, 'vote': vote})
-        redis.rpush('votes', data) """
     if request.method == 'POST':
         producer = get_kafka_producer()
         vote = request.form['vote']
@@ -55,7 +44,7 @@ def hello():
         
         # Enviar los datos a Kafka
         producer.send('testtopic', value=data)
-        producer.flush()
+        #producer.flush()
 
     resp = make_response(render_template(
         'index.html',
