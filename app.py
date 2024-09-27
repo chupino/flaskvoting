@@ -26,7 +26,7 @@ def get_redis():
 def get_kafka_producer():
     if not hasattr(g, 'kafka_producer'):
         g.kafka_producer = KafkaProducer(
-            bootstrap_servers='3.88.186.115:9093',
+            bootstrap_servers='35.170.192.17',
             value_serializer=lambda v: json.dumps(v).encode('utf-8')  # Serializar los datos como JSON
         )
     return g.kafka_producer
