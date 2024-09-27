@@ -54,7 +54,7 @@ def hello():
         data = {'voter_id': voter_id, 'vote': vote}
         
         # Enviar los datos a Kafka
-        producer.send('votes', value=data)
+        producer.send('testtopic', value=data)
         producer.flush()
 
     resp = make_response(render_template(
