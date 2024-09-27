@@ -21,7 +21,7 @@ app.logger.setLevel(logging.INFO)
 def get_kafka_producer():
     if not hasattr(g, 'kafka_producer'):
         g.kafka_producer = KafkaProducer(
-            bootstrap_servers='35.170.192.17',
+            bootstrap_servers='18.207.186.163',
             value_serializer=lambda v: json.dumps(v).encode('utf-8')  # Serializar los datos como JSON
         )
     return g.kafka_producer
